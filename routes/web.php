@@ -1,12 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\BarangController;
-use App\Http\Controllers\KaryawanController;
-use App\Http\Controllers\UnitController;
-use App\Http\Controllers\JabatanController;
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\DataController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,9 +29,11 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 Route::get('/', [DashboardController::class, 'index'])->middleware('auth');
 
 //route barang
-Route::resource('/barang', BarangController::class)->middleware('auth');
-Route::resource('/karyawan', KaryawanController::class)->middleware('auth');
-Route::resource('/units', UnitController::class)->middleware('auth');
-Route::resource('/jabatans', JabatanController::class)->middleware('auth');
-Route::post('/units', [UnitController::class, 'store']);
-Route::post('/jabatans', [JabatanController::class, 'store']);
+// Route::resource('/barang', BarangController::class)->middleware('auth');
+// Route::resource('/karyawan', KaryawanController::class)->middleware('auth');
+// Route::resource('/units', UnitController::class)->middleware('auth');
+// Route::resource('/jabatans', JabatanController::class)->middleware('auth');
+Route::resource('/data', DataController::class)->middleware('auth');
+Route::resource('/book', BookController::class)->middleware('auth');
+Route::patch('/data/update-status/{id}', [DataController::class, 'updateStatus'])->name('data.updateStatus');
+

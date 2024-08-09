@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Karyawan;
+// use App\Models\Karyawan;
 use App\Models\Login;
 use App\Models\Unit;
-use App\Models\Jabatan;
+// use App\Models\Jabatan;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
 
         // Menghitung jumlah karyawan
-        $jumlahKaryawan = Karyawan::count();
+        // $jumlahKaryawan = Karyawan::count();
 
         // Menghitung jumlah login berdasarkan rentang waktu
         $jumlahLogin = Login::whereBetween('login_time', [$startDate, $endDate])->count();
@@ -26,7 +26,7 @@ class DashboardController extends Controller
         $jumlahUnit = Unit::count();
 
         // Menghitung jumlah jabatan
-        $jumlahJabatan = Jabatan::count();
+        // $jumlahJabatan = Jabatan::count();
 
         // Mendapatkan top 10 pengguna yang login lebih dari 25 kali dalam rentang waktu yang ditentukan
         $topUsers = Login::select('user_id', \DB::raw('count(*) as login_count'))
@@ -38,10 +38,10 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard.dashboard', [
-            'jumlahKaryawan' => $jumlahKaryawan,
+            // 'jumlahKaryawan' => $jumlahKaryawan,
             'jumlahLogin' => $jumlahLogin,
             'jumlahUnit' => $jumlahUnit,
-            'jumlahJabatan' => $jumlahJabatan,
+            // 'jumlahJabatan' => $jumlahJabatan,
             'topUsers' => $topUsers,
             'startDate' => $startDate,
             'endDate' => $endDate,

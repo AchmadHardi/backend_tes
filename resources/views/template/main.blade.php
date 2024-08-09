@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title') | RSIA Puri Bunda</title>
+    <title>@yield('title') | TriasMitra</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -38,9 +38,6 @@
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="/" class="nav-link">Dashboard</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="/" class="nav-link">Barang</a>
                 </li>
             </ul>
 
@@ -170,6 +167,15 @@
                     </a>
                 </li> --}}
             </ul>
+            <li class="nav-item">
+                <a class="log-out ml-3" href="#" class="nav-link">
+                    <i class="nav-icon fa-solid fa-power-off" style="color: red;"></i>
+                    Logout
+                    <form action="/logout" method="POST" id="logging-out">
+                        @csrf
+                    </form>
+                </a>
+            </li>
         </nav>
         <!-- /.navbar -->
 
@@ -179,7 +185,7 @@
             <a href="/dashboard" class="brand-link">
                 <img src="/assets/dist/img/AdminLTELogo.png" alt="AdminLTE Logo"
                     class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">RSIA Puri Bunda</span>
+                <span class="brand-text font-weight-light">TriasMitra</span>
             </a>
 
             <!-- Sidebar -->
@@ -221,47 +227,16 @@
                                 </p>
                             </a>
                         </li>
-                        {{-- <li class="nav-item">
-                            <a href="/barang" class="nav-link">
-                                <i class="nav-icon fa-solid fa-box"></i>
-                                <p>
-                                    Barang
-                                </p>
-                            </a>
-                        </li> --}}
                         <li class="nav-item">
-                            <a href="/karyawan" class="nav-link">
-                                <i class="nav-icon fa-solid fa-box"></i>
+                            <a href="/book" class="nav-link">
+                                <i class="nav-icon fa-solid fa-user"></i>
                                 <p>
-                                    Karyawan
+                                    Data Buku
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="/units" class="nav-link">
-                                <i class="nav-icon fa-solid fa-box"></i>
-                                <p>
-                                    Unit
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/jabatans" class="nav-link">
-                                <i class="nav-icon fa-solid fa-box"></i>
-                                <p>
-                                    Jabatan
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="log-out ml-3" href="#" class="nav-link">
-                                <i class="nav-icon fa-solid fa-power-off" style="color: red;"></i>
-                                Logout
-                                <form action="/logout" method="POST" id="logging-out">
-                                    @csrf
-                                </form>
-                            </a>
-                        </li>
+
+
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -292,7 +267,7 @@
 
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2023 <a href="https://andisdev.tech">Andis Dev</a>.</strong> All rights
+            <strong>Copyright &copy; 2024 <a href="#">Achmad</a>.</strong> All rights
             reserved.
         </footer>
     </div>
@@ -351,8 +326,8 @@
             e.preventDefault();
             var form = $(this).closest("form");
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You will not be able to revert this!",
+                title: 'Apakah yakin?',
+                text: "Data ini tidak bisa dikembalikan!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#7367f0',

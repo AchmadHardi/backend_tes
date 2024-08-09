@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\DataController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Passport\Passport;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Middleware untuk melindungi route dengan Passport
+Route::middleware('auth:api')->group(function () {
+    Route::patch('/data/update-status/{id}', [DataController::class, 'updateStatus'])->name('data.updateStatus');
 });

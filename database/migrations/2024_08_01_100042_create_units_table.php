@@ -11,17 +11,22 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('units', function (Blueprint $table) {
-            $table->id(); // Kolom primary key
-            $table->string('name'); // Kolom untuk nama unit
-            $table->timestamps(); // Kolom timestamp untuk created_at dan updated_at
-        });
+        // Periksa apakah tabel 'units' sudah ada sebelum membuatnya
+        if (!Schema::hasTable('units')) {
+            Schema::create('units', function (Blueprint $table) {
+                $table->id(); // Kolom primary key
+                $table->string('name'); // Kolom untuk nama unit
+                $table->timestamps(); // Kolom timestamp untuk created_at dan updated_at
+            });
+        }
     }
+
     /**
      * Reverse the migrations.
      */
     public function down()
     {
+        // Hapus tabel 'units' jika ada
         Schema::dropIfExists('units');
     }
 };
