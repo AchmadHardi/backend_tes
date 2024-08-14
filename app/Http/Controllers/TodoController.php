@@ -49,21 +49,28 @@ class TodoController extends Controller
     public function getChecklistDetails($id)
     {
         $checklist = Checklist::where('user_id', auth()->id())->findOrFail($id);
-        return response()->json($checklist->load('items'));
+        return response()->json($checklist->load('todoItems'));
     }
 
+
+    // TodoController.php
     public function createTodoItem(Request $request, $checklistId)
     {
+        // Validasi input dari request
         $request->validate([
-            'title' => 'required|string|max:255',
+            'item' => 'required|string|max:255',
         ]);
 
+        // Temukan checklist berdasarkan user_id dan checklist_id
         $checklist = Checklist::where('user_id', auth()->id())->findOrFail($checklistId);
 
-        $item = $checklist->items()->create([
-            'title' => $request->title,
+        // Buat item baru yang terkait dengan checklist
+        $item = $checklist->todoItems()->create([
+            'item' => $request->item,
+            'is_completed' => false, // Anda bisa menyesuaikan ini sesuai kebutuhan
         ]);
 
+        // Kembalikan respons JSON
         return response()->json($item, 201);
     }
 

@@ -13,6 +13,6 @@ class Checklist extends Model
 
     public function todoItems()
     {
-        return $this->hasMany(TodoItem::class);
+        return $this->hasMany(TodoItem::class, 'checklist_id');
     }
 }
