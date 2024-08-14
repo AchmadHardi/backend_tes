@@ -101,41 +101,63 @@ class TodoController extends Controller
 
     public function getTodoItem($id)
     {
-        $item = TodoItem::where('user_id', auth()->id())->findOrFail($id);
+        $item = TodoItem::where('id', auth()->id())->findOrFail($id);
         return response()->json($item);
     }
 
     public function updateTodoItem(Request $request, $id)
     {
-        $item = TodoItem::where('user_id', auth()->id())->findOrFail($id);
+        $item = TodoItem::where('id', auth()->id())->findOrFail($id);
 
         $request->validate([
-            'title' => 'required|string|max:255',
+            'item' => 'required|string|max:255',
         ]);
 
-        $item->update($request->only('title'));
+        $item->update($request->only('item'));
 
         return response()->json($item);
     }
 
     public function updateTodoItemStatus(Request $request, $id)
     {
-        $item = TodoItem::where('user_id', auth()->id())->findOrFail($id);
-
+        // Validasi request
         $request->validate([
             'completed' => 'required|boolean',
         ]);
 
-        $item->update(['completed' => $request->completed]);
+        // Temukan item dengan ID yang sesuai
+        $item = TodoItem::where('id', $id)
+                        ->whereHas('checklist', function ($query) {
+                            $query->where('user_id', auth()->id());
+                        })
+                        ->firstOrFail();
 
+        // Konversi nilai boolean ke integer
+        $isCompleted = $request->completed ? 1 : 0;
+
+        // Perbarui status item
+        $item->update(['is_completed' => $isCompleted]);
+
+        // Kembalikan respons JSON
         return response()->json($item);
     }
 
     public function deleteTodoItem($id)
-    {
-        $item = TodoItem::where('user_id', auth()->id())->findOrFail($id);
-        $item->delete();
+{
+    // Temukan item dengan ID yang sesuai
+    $item = TodoItem::where('id', $id)
+                    ->whereHas('checklist', function ($query) {
+                        $query->where('user_id', auth()->id());
+                    })
+                    ->firstOrFail();
 
-        return response()->json(null, 204);
-    }
+    // Hapus item
+    $item->delete();
+
+    // Kembalikan respons JSON dengan status 204 No Content
+    return response()->json([
+        'success' => 'Checklist successfully deleted!'
+    ], 200); // Gunakan status code 200 OK
+}
+
 }
