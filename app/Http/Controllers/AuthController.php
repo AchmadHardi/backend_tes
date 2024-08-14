@@ -3,113 +3,100 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use RealRashid\SweetAlert\Facades\Alert;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
-    public function index()
-    {
 
-        return view('auth.login', [
-            'title' => 'Login',
-        ]);
+    public function __construct()
+    {
+        // Hanya terapkan middleware 'auth:api' pada rute yang memerlukan autentikasi
+        $this->middleware('auth:api')->except(['login', 'register']);
     }
 
-    public function authenticate(Request $request)
+    // Metode untuk registrasi pengguna
+    public function register(Request $request)
     {
-        // Validasi kredensial
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required'
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|confirmed',
         ]);
 
-        // Cek validasi
         if ($validator->fails()) {
-            // Jika validasi gagal, kembalikan pesan kesalahan tanpa respons JSON
-            return redirect()->back()->withErrors($validator)->withInput();
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Cek apakah kredensial valid
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $request->session()->regenerate();
-
-            // Buat token dengan nama yang spesifik
-            $user = Auth::user();
-            $token = $user->createToken('Triasmitra2024IT')->plainTextToken;
-
-            // Tampilkan pesan sukses dan redirect ke dashboard
-            Alert::success('Success', 'Login success!');
-            return redirect()->intended('/dashboard');
-        } else {
-            // Jika kredensial tidak valid, kembalikan pesan kesalahan tanpa respons JSON
-            Alert::error('Error', 'Username atau password salah.');
-            return redirect()->back()->withInput();
-        }
-    }
-
-    public function register()
-    {
-        return view('auth.register', [
-            'title' => 'Register',
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
+
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => 3600 // Waktu kedaluwarsa token dalam detik
+        ], 201);
     }
 
+    // Metode untuk login pengguna
     public function login(Request $request)
     {
-        // Validasi kredensial
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $credentials['email'])->first();
 
-        // Cek apakah kredensial valid
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-            // Buat token dengan nama yang spesifik
-            $token = $user->createToken('Triasmitra2024IT')->accessToken;
+        try {
+            $token = JWTAuth::fromUser($user);
 
-            // Kembalikan token sebagai respons JSON
+            if (!$token) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
             return response()->json([
                 'token' => $token,
                 'token_type' => 'Bearer',
                 'expires_in' => 3600 // Waktu kedaluwarsa token dalam detik
             ]);
-        } else {
-            // Jika kredensial tidak valid, kembalikan respons error
-            return response()->json(['error' => 'Unauthorized'], 401);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not create token'], 500);
         }
     }
 
 
-    public function process(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required',
-            'email' => 'required|unique:users',
-            'password' => 'required',
-            'passwordConfirm' => 'required|same:password'
-        ]);
 
-        $validated['password'] = Hash::make($request['password']);
 
-        $user = User::create($validated);
-
-        Alert::success('Success', 'Register user has been successfully !');
-        return redirect('/login');
-    }
-
+    // Metode untuk logout
     public function logout(Request $request)
     {
-        Auth::logout();
-
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
-        Alert::success('Success', 'Log out success !');
-        return redirect('/login');
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json(['message' => 'Successfully logged out'], 200);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not log out'], 500);
+        }
     }
+
+    // public function index()
+    // {
+    //     return response()->json([
+    //         'message' => 'Welcome to the AuthController',
+    //         'available_endpoints' => [
+    //             'POST /login' => 'Authenticate user and get a token',
+    //             'POST /register' => 'Register a new user',
+    //             'POST /logout' => 'Logout the user'
+    //         ]
+    //     ]);
+    // }
 }
